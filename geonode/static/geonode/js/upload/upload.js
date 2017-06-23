@@ -298,6 +298,14 @@ define(['underscore',
      *
      *  @returns false
      */
+    /**
+     * We shoul extend this upload function to provide chunked upload
+     * My current solution:
+     * --> Chunk upload file separately from form data (because I dont know what form data is it)
+     * --> Submit form (exclude the file)
+     * --> Process, while getting the chunked upload file from filesystem
+     *
+     */
     doUploads = function () {
         if ($.isEmptyObject(layers)) {
             common.logError('Please provide some files');
