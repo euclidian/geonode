@@ -82,11 +82,11 @@ class LayerForm(ResourceBaseForm):
 
 
 class LayerUploadForm(forms.Form):
-    base_file = forms.FileField()
-    dbf_file = forms.FileField(required=False)
-    shx_file = forms.FileField(required=False)
-    prj_file = forms.FileField(required=False)
-    xml_file = forms.FileField(required=False)
+    base_file = forms.CharField()
+    dbf_file = forms.CharField(required=False)
+    shx_file = forms.CharField(required=False)
+    prj_file = forms.CharField(required=False)
+    xml_file = forms.CharField(required=False)
 
     charset = forms.CharField(required=False)
     metadata_uploaded_preserve = forms.BooleanField(required=False)
