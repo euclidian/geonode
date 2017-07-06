@@ -21,6 +21,7 @@
 from django.conf.urls import patterns, url
 from django.conf import settings
 from django.views.generic import TemplateView
+from layer_uploader import upload_chunk
 
 js_info_dict = {
     'packages': ('geonode.layers',),
@@ -46,6 +47,7 @@ urlpatterns = patterns(
     url(r'^(?P<layername>[^/]*)/metadata_detail$', 'layer_metadata_detail', name='layer_metadata_detail'),
     url(r'^(?P<layername>[^/]*)/metadata_upload$', 'layer_metadata_upload', name='layer_metadata_upload'),
     url(r'^(?P<layername>[^/]*)/feature_catalogue$', 'layer_feature_catalogue', name='layer_feature_catalogue'),
+    url(r'^api/chunk-file-uploader/(?P<uuid>.+)$',upload_chunk),
 
     # url(r'^api/batch_permissions/?$', 'batch_permissions',
     #    name='batch_permssions'),
