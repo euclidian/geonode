@@ -10,6 +10,11 @@
 {% block head %}
 
 
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<script src="/static/lib/js/jquery.fileupload.js"></script>
+
+
 {{ block.super }}
 {% endblock %}
 
@@ -128,10 +133,6 @@
 
 
 {% block extra_script %}
-
-<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-<script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.18.0/js/jquery.fileupload-jquery-ui.js"></script>
 {{ block.super }}
 <script data-main="{% static 'geonode/js/upload/main' %}"
   src="{% static 'lib/js/require.js' %}">

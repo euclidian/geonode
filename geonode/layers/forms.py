@@ -124,15 +124,15 @@ class LayerUploadForm(forms.Form):
                 raise forms.ValidationError(
                     "Zip files can only contain shapefile.")
         else:
-            base_name, base_ext = os.path.splitext(cleaned["base_file"].name)
+            base_name, base_ext = os.path.splitext(cleaned["base_file"])
             if cleaned["dbf_file"] is not None:
-                dbf_file = cleaned["dbf_file"].name
+                dbf_file = cleaned["dbf_file"]
             if cleaned["shx_file"] is not None:
-                shx_file = cleaned["shx_file"].name
+                shx_file = cleaned["shx_file"]
             if cleaned["prj_file"] is not None:
-                prj_file = cleaned["prj_file"].name
+                prj_file = cleaned["prj_file"]
             if cleaned["xml_file"] is not None:
-                xml_file = cleaned["xml_file"].name
+                xml_file = cleaned["xml_file"]
 
         if not cleaned["metadata_upload_form"] and base_ext.lower() not in (
                 ".shp", ".tif", ".tiff", ".geotif", ".geotiff", ".asc"):
