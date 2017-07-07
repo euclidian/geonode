@@ -9,12 +9,6 @@
 
 {% block head %}
 
-
-<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-<script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
-<script src="/static/lib/js/jquery.fileupload.js"></script>
-
-
 {{ block.super }}
 {% endblock %}
 
@@ -83,12 +77,8 @@
 
     <form id="file-uploader" method="post" enctype="multipart/form-data">
       <!-- UI change to hide the list of previously uploaded files from the user -->
-{#      <input type="file-test" id="file-input" style="display: none;" multiple>#}
+      <input type="file" id="file-input" style="display: none;" multiple>
         {{ form.as_p }}
-        <div class="add-file btn btn-outline btn-primary btn-lg">
-            <span>Upload Layers</span>
-            <input id="file-upload" name="file" type="file" class="upload" accept=".dbf,.prj,.qpj,.shp,.shx,.zip" multiple/>
-        </div>
       <input class="btn btn-default" type="button" value="Choose Files" onclick="document.getElementById('file-input').click();">
     </form>
 
@@ -166,28 +156,6 @@ var uuid = guid();
 
 $(document).ready(function(){
     var upload_url = '/layer/api/chunk-file-uploader/' + uuid;
-    $('#file-uploader').fileupload({
-        url: upload_url,
-        dataType: 'json',
-        maxRetries: 100,
-        retryTimeout: 500000,
-        maxChunkSize: 100000, // 100 KB
-        add: function (e, uploadData) {
-        },
-        fail: function (e, uploadData) {
-            var filename = uploadData.files[0].name;
-            console.log(filename + " Failed");
-        },
-        done: function (e, uploadData) {
-            var filename = uploadData.files[0].name;
-            console.log(filename +" is complete");
-        },
-        progress: function (e, uploadData) {
-            var filename = uploadData.files[0].name;
-            var progress = parseInt(uploadData.loaded / uploadData.total * 100, 10);
-            console.log(filename +" progress: " + progress + " %");
-        }
-    });
 });
 
 </script>

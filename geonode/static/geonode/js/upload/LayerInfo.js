@@ -477,6 +477,75 @@ define(function (require, exports) {
         }
     };
 
+    LayerInfo.prototype._chunkUpload = function(file, url, onSuccess) {
+        var loaded = 0;
+        var step = 1024 * 1024; // Size of a chunk
+        var total = file.size;
+        var start = 0;
+        var stepCount = 0;
+        var reader = new FileReader();
+        var blob = file.slice(start,step);// Read each chunk
+        reader.readAsBinaryString(blob);
+
+        //add uuid to determine which file is being uploaded
+        var uuid = guid();
+
+        // this function will be invoked each time a file reader read a file
+        // Thus will be recursively called for each chunk
+        reader.onload = function(e){
+            var d = {file : reader.result}
+            console.log("Step Count: " + stepCount++);
+            $.ajax({
+                url: url + "/" + uuid,
+                type: "POST",
+                data: d
+            }).done(function () {
+                //we already upload another step of file, add it to total uploaded
+                loaded += step;
+                if(loaded < total){
+                    //read again the file
+                    blob = file.slice(loaded, loaded + step);
+                    reader.readAsBinaryString(blob);
+                    //after read the blob, reader.onload will be revoked again
+                }else{
+                    //file is uploaded completely
+                    loaded = total; // just to stop the loop
+                    //call the callback function
+                    onSuccess();
+                }
+
+            });
+        }
+    }
+
+    function guid() {
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+            s4() + '-' + s4() + s4() + s4();
+    }
+
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+    }
+
+    LayerInfo.prototype.chunkUpload = function(index) {
+        //get all files that listed with this layer
+        var files = this.files;
+        var self = this;
+        var url = "/layer/api/chunk-file-uploader";
+        if(!index) index = 0;
+        // Queue all files to upload
+        this._chunkUpload(files[index],url,function(){
+           if(index >= files.length){
+               self.uploadFiles();
+           }else{
+               //upload next file
+               self.chunkUpload(index++);
+           }
+        });
+    }
+
     /** Function to upload the files against the specified endpoint
      *
      *  @params
