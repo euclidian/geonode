@@ -27,6 +27,12 @@ js_info_dict = {
     'packages': ('geonode.layers',),
 }
 
+
+api_urls = patterns(
+    '',
+    url(r'^api/chunk-file-uploader/(?P<uuid>.+)$',upload_chunk),
+)
+
 urlpatterns = patterns(
     'geonode.layers.views',
     url(r'^$',
@@ -47,12 +53,11 @@ urlpatterns = patterns(
     url(r'^(?P<layername>[^/]*)/metadata_detail$', 'layer_metadata_detail', name='layer_metadata_detail'),
     url(r'^(?P<layername>[^/]*)/metadata_upload$', 'layer_metadata_upload', name='layer_metadata_upload'),
     url(r'^(?P<layername>[^/]*)/feature_catalogue$', 'layer_feature_catalogue', name='layer_feature_catalogue'),
-    url(r'^api/chunk-file-uploader/(?P<uuid>.+)$',upload_chunk),
 
     # url(r'^api/batch_permissions/?$', 'batch_permissions',
     #    name='batch_permssions'),
     # url(r'^api/batch_delete/?$', 'batch_delete', name='batch_delete'),
-)
+) + api_urls
 
 # -- Deprecated url routes for Geoserver authentication -- remove after GeoNode 2.1
 # -- Use /gs/acls, gs/resolve_user/, gs/download instead

@@ -22,6 +22,9 @@ define(function (require, exports) {
         this.name     = null;
         this.files    = null;
 
+        //list of filename that has been chunked
+        this.chunked_files = null;
+
         this.type     = null;
         this.main     = null;
 
@@ -493,13 +496,15 @@ define(function (require, exports) {
         // this function will be invoked each time a file reader read a file
         // Thus will be recursively called for each chunk
         reader.onload = function(e){
-            var d = {file : reader.result}
+            var d = { 'file' : reader.result, 'filename' : file.name }
             console.log("Step Count: " + stepCount++);
             $.ajax({
                 url: url + "/" + uuid,
                 type: "POST",
-                data: d
-            }).done(function () {
+                data: JSON.stringify(d),
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json'
+            }).done(function (data) {
                 //we already upload another step of file, add it to total uploaded
                 loaded += step;
                 if(loaded < total){
@@ -511,7 +516,7 @@ define(function (require, exports) {
                     //file is uploaded completely
                     loaded = total; // just to stop the loop
                     //call the callback function
-                    onSuccess();
+                    onSuccess(data);
                 }
 
             });
@@ -530,15 +535,20 @@ define(function (require, exports) {
     }
 
     LayerInfo.prototype.chunkUpload = function(index) {
+        //set all chunked file to new array
+        this.chunked_files = [];
         //get all files that listed with this layer
         var files = this.files;
         var self = this;
-        var url = "/layer/api/chunk-file-uploader";
+        var url = "/layers/api/chunk-file-uploader";
         if(!index) index = 0;
         // Queue all files to upload
-        this._chunkUpload(files[index],url,function(){
+        this._chunkUpload(files[index],url,function(data){
+           //set filename to array
+            this.chunked_files.append(data.name);
            if(index >= files.length){
-               self.uploadFiles();
+               // self.uploadFiles();
+               console.log("Finish Upload File")
            }else{
                //upload next file
                self.chunkUpload(index++);
