@@ -139,25 +139,6 @@
 
 {% endautoescape %}
 
-
-function guid() {
-    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-        s4() + '-' + s4() + s4() + s4();
-}
-
-function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-        .toString(16)
-        .substring(1);
-}
-
-var is_in_upload = false;
-var uuid = guid();
-
-$(document).ready(function(){
-    var upload_url = '/layer/api/chunk-file-uploader/' + uuid;
-});
-
 </script>
 {% if GEONODE_SECURITY_ENABLED %}
 {% with resource=layer %}

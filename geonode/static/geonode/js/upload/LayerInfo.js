@@ -501,7 +501,7 @@ define(function (require, exports) {
         }
     };
 
-    LayerInfo.prototype._chunkUpload = function(file, url, onSuccess) {
+    LayerInfo.prototype._chunkUpload = function(file, url, uuid, onSuccess) {
         var loaded = 0;
         var step = 1024 * 1024; // Size of a chunk
         var total = file.size;
@@ -567,7 +567,7 @@ define(function (require, exports) {
             $("#file_uuid").val(uuid);
         }
         // Queue all files to upload
-        this._chunkUpload(files[index],url,function(data){
+        this._chunkUpload(files[index],url, uuid, function(data){
            //set filename to array
             self.chunked_files.push(data.name);
            if(index == files.length - 1){
