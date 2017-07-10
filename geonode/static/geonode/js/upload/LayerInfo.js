@@ -262,14 +262,15 @@ define(function (require, exports) {
 			}
         }
 
-        form_data.append('base_file', this.main);
+        // get base file name that match the extension
+        form_data.append('base_file', this.main.name);
         form_data.append('permissions', JSON.stringify(perm));
 
         for (i = 0; i < this.files.length; i += 1) {
             file = this.files[i];
             if (file.name !== this.name) {
                 ext = path.getExt(file);
-                form_data.append(ext + '_file', file);
+                form_data.append(ext + '_file', file.name);
             }
         }
 
@@ -535,19 +536,20 @@ define(function (require, exports) {
     }
 
     LayerInfo.prototype.chunkUpload = function(index) {
-        //set all chunked file to new array
-        this.chunked_files = [];
         //get all files that listed with this layer
         var files = this.files;
         var self = this;
         var url = "/layers/api/chunk-file-uploader";
         if(!index) index = 0;
+        if(index == 0){
+            this.chunked_files = [];
+        }
         // Queue all files to upload
         this._chunkUpload(files[index],url,function(data){
            //set filename to array
             self.chunked_files.push(data.name);
            if(index == files.length - 1){
-               // self.uploadFiles();
+               self.uploadFiles();
                console.log("Finish Upload File")
            }else{
                //upload next file
