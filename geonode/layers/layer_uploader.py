@@ -16,7 +16,7 @@ def upload_chunk(request, uuid):
     try:
         if request.method == 'POST':
             body = json.loads(request.body)
-            _file = unicode(body["file"])
+            _file = body["file"]
             filename = body["filename"]
             filenames = os.path.splitext(filename)
             # folder for this campaign
@@ -39,8 +39,8 @@ def upload_chunk(request, uuid):
             with open(filename, 'wb+') as destination:
                 destination.write(_file.encode("utf-8"))
             # send response with appropriate mime type header
-            return HttpResponse(json.dumps({
-                "name": _file.name,
+            return HttpResponse(status=200, content=json.dumps({
+                "name": body["filename"],
                 "size": os.path.getsize(filename),
                 "thumbnail_url": None,
                 "delete_url": None,

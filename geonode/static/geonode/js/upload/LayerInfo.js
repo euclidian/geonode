@@ -497,7 +497,7 @@ define(function (require, exports) {
         // Thus will be recursively called for each chunk
         reader.onload = function(e){
             var d = { 'file' : reader.result, 'filename' : file.name }
-            console.log("Step Count: " + stepCount++);
+            console.log("Step Count: " + stepCount++ + " for file: " + file.name);
             $.ajax({
                 url: url + "/" + uuid,
                 type: "POST",
@@ -545,13 +545,13 @@ define(function (require, exports) {
         // Queue all files to upload
         this._chunkUpload(files[index],url,function(data){
            //set filename to array
-            this.chunked_files.append(data.name);
-           if(index >= files.length){
+            self.chunked_files.push(data.name);
+           if(index == files.length - 1){
                // self.uploadFiles();
                console.log("Finish Upload File")
            }else{
                //upload next file
-               self.chunkUpload(index++);
+               self.chunkUpload(++index);
            }
         });
     }
