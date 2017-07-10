@@ -87,6 +87,7 @@ class LayerUploadForm(forms.Form):
     shx_file = forms.CharField(required=False)
     prj_file = forms.CharField(required=False)
     xml_file = forms.CharField(required=False)
+    file_uuid = forms.CharField(required=False)
 
     charset = forms.CharField(required=False)
     metadata_uploaded_preserve = forms.BooleanField(required=False)
@@ -172,9 +173,8 @@ class LayerUploadForm(forms.Form):
         return cleaned
 
     def write_files(self):
-
         absolute_base_file = None
-        tempdir = tempfile.mkdtemp()
+        tempdir = os.path.join(settings.TEMP_FOLDER, "chunk", self.cleaned_data['file_uuid']);
 
         if zipfile.is_zipfile(self.cleaned_data['base_file']):
             absolute_base_file = unzip_file(self.cleaned_data['base_file'], '.shp', tempdir=tempdir)
@@ -182,22 +182,20 @@ class LayerUploadForm(forms.Form):
         else:
             for field in self.spatial_files:
                 f = self.cleaned_data[field]
-                if f is not None:
-                    path = os.path.join(tempdir, f.name)
-                    with open(path, 'wb') as writable:
-                        for c in f.chunks():
-                            writable.write(c)
-            absolute_base_file = os.path.join(tempdir,
-                                              self.cleaned_data["base_file"].name)
+                # f is filename that resides in temporary chunked file
+                if f is None:
+                    # raise file not found exception
+                    raise IOError("Chunked File is not found in File system")
+            absolute_base_file = self.cleaned_data["base_file"]
         return tempdir, absolute_base_file
 
 
 class NewLayerUploadForm(LayerUploadForm):
     if 'geonode.geoserver' in settings.INSTALLED_APPS:
-        sld_file = forms.FileField(required=False)
+        sld_file = forms.CharField(required=False)
     if 'geonode.qgis_server' in settings.INSTALLED_APPS:
-        qml_file = forms.FileField(required=False)
-    xml_file = forms.FileField(required=False)
+        qml_file = forms.CharField(required=False)
+    xml_file = forms.CharField(required=False)
 
     abstract = forms.CharField(required=False)
     layer_title = forms.CharField(required=False)

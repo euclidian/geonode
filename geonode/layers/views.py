@@ -162,7 +162,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
                 name_base = title
             else:
                 name_base, __ = os.path.splitext(
-                    form.cleaned_data["base_file"].name)
+                    form.cleaned_data["base_file"])
             name = slugify(name_base.replace(".", "_"))
             try:
                 # Moved this inside the try/except block because it can raise

@@ -263,14 +263,25 @@ define(function (require, exports) {
         }
 
         // get base file name that match the extension
-        form_data.append('base_file', this.main.name);
+        var file_index = arrayContainsString(this.chunked_files,this.main.name);
+        if(file_index > -1){
+            form_data.append('base_file', this.chunked_files[file_index]);
+        }else{
+            form_data.append('base_file', this.main.name);
+        }
         form_data.append('permissions', JSON.stringify(perm));
+        form_data.append('file_uuid', $("#file_uuid").val());
 
         for (i = 0; i < this.files.length; i += 1) {
             file = this.files[i];
             if (file.name !== this.name) {
                 ext = path.getExt(file);
-                form_data.append(ext + '_file', file.name);
+                file_index = arrayContainsString(this.chunked_files,file.name);
+                if(file_index > -1){
+                    form_data.append(ext + '_file', this.chunked_files[file_index]);
+                }else{
+                    form_data.append(ext + '_file', file.name);
+                }
             }
         }
 
@@ -293,6 +304,15 @@ define(function (require, exports) {
         options.element = this.element.find('#status');
         common.logStatus(options);
     };
+
+    function arrayContainsString(array, string){
+        for(var i=0; i< array.length ; i++){
+            if(array[i].indexOf(string) > -1 ){
+                return i;
+            }
+        }
+        return -1;
+    }
 
     /** Function to mark errors in the the status
      *
@@ -491,9 +511,6 @@ define(function (require, exports) {
         var blob = file.slice(start,step);// Read each chunk
         reader.readAsBinaryString(blob);
 
-        //add uuid to determine which file is being uploaded
-        var uuid = guid();
-
         // this function will be invoked each time a file reader read a file
         // Thus will be recursively called for each chunk
         reader.onload = function(e){
@@ -535,7 +552,7 @@ define(function (require, exports) {
             .substring(1);
     }
 
-    LayerInfo.prototype.chunkUpload = function(index) {
+    LayerInfo.prototype.chunkUpload = function(index, uuid) {
         //get all files that listed with this layer
         var files = this.files;
         var self = this;
@@ -543,6 +560,11 @@ define(function (require, exports) {
         if(!index) index = 0;
         if(index == 0){
             this.chunked_files = [];
+        }
+        if(!uuid){
+            //add uuid to determine which file is being uploaded
+            uuid = guid();
+            $("#file_uuid").val(uuid);
         }
         // Queue all files to upload
         this._chunkUpload(files[index],url,function(data){
@@ -553,7 +575,7 @@ define(function (require, exports) {
                console.log("Finish Upload File")
            }else{
                //upload next file
-               self.chunkUpload(++index);
+               self.chunkUpload(++index, uuid);
            }
         });
     }
