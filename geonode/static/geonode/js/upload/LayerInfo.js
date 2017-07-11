@@ -501,34 +501,54 @@ define(function (require, exports) {
         }
     };
 
+    LayerInfo.prototype.sendData = function(data, url, done){
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: data,
+            cache: false,
+            contentType: false,
+            processData: false
+        }).done(function(data){
+            done(data);
+        });
+
+    }
+
     LayerInfo.prototype._chunkUpload = function(file, url, uuid, onSuccess) {
         var loaded = 0;
-        var step = 1024 * 1024; // Size of a chunk
+        var step = 1024; // Size of a chunk
         var total = file.size;
         var start = 0;
         var stepCount = 0;
         var reader = new FileReader();
         var blob = file.slice(start,step);// Read each chunk
-        reader.readAsBinaryString(blob);
+        reader.readAsArrayBuffer(blob);
+        var self = this;
 
         // this function will be invoked each time a file reader read a file
         // Thus will be recursively called for each chunk
         reader.onload = function(e){
-            var d = { 'file' : reader.result, 'filename' : file.name }
             console.log("Step Count: " + stepCount++ + " for file: " + file.name);
-            $.ajax({
-                url: url + "/" + uuid,
-                type: "POST",
-                data: JSON.stringify(d),
-                contentType: "application/json; charset=utf-8",
-                dataType: 'json'
-            }).done(function (data) {
+            //create a blob from reader
+            var blob =  new Blob([reader.result]);
+            //create form data to send to server
+            var formData = new FormData();
+            formData.append("file", blob);
+            formData.append("filename", file.name);
+            formData.append("offset", loaded);
+            formData.append("file_size", total);
+
+            //send it via ajax
+            self.sendData(formData, url + "/" + uuid, function(data){
+                //if ajax done, do it recursively
                 //we already upload another step of file, add it to total uploaded
                 loaded += step;
                 if(loaded < total){
                     //read again the file
                     blob = file.slice(loaded, loaded + step);
-                    reader.readAsBinaryString(blob);
+                    reader.readAsArrayBuffer(blob);
                     //after read the blob, reader.onload will be revoked again
                 }else{
                     //file is uploaded completely
@@ -568,6 +588,7 @@ define(function (require, exports) {
         }
         // Queue all files to upload
         this._chunkUpload(files[index],url, uuid, function(data){
+            data = JSON.parse(data);
            //set filename to array
             self.chunked_files.push(data.name);
            if(index == files.length - 1){

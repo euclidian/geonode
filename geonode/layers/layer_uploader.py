@@ -15,9 +15,10 @@ def upload_chunk(request, uuid):
     """
     try:
         if request.method == 'POST':
-            body = json.loads(request.body)
-            _file = body["file"]
-            filename = body["filename"]
+            _file = request.FILES["file"]
+            filename = request.POST["filename"]
+            offset = long(request.POST["offset"])
+            filesize = request.POST["file_size"]
             # folder for this campaign
             foldername = os.path.join(
                 settings.TEMP_FOLDER,
@@ -32,8 +33,14 @@ def upload_chunk(request, uuid):
                 foldername,
                 filename
             )
-            with open(filename, 'wb+') as destination:
-                destination.write(_file.encode("utf-8"))
+
+            if offset == 0:
+                if os.path.exists(filename):
+                    os.remove(filename)
+            with open(filename, 'ab') as f:
+                f.seek(offset)
+                f.write(_file.read())
+
             # send response with appropriate mime type header
             return HttpResponse(status=200, content=json.dumps({
                 "name": filename,
